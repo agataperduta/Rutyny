@@ -1,0 +1,21 @@
+{
+  "name": "Rutyny",
+  "short_name": "Rutyny",
+  "description": "Poranek, powrót do domu i wieczór – jeden krok na raz.",
+  "lang": "pl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FAF6EF",
+  "theme_color": "#FAF6EF",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Poranek", "url": "./?r=rano", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]},
+    {"name": "Powrót do domu", "url": "./?r=powrot", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]},
+    {"name": "Wieczór", "url": "./?r=wieczor", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]}
+  ]
+}

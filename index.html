@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rutyny</title>
+<meta name="theme-color" content="#FAF6EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1D1B22" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+
+/* Layout: one column, phone-first; home = one big "now" card + quiet list; focus = one step, one main button */
+:root{
+  --bg:#FAF6EF; --card:#FFFFFF; --ink:#2E2A26; --muted:#7A7064; --line:#EFE6D8;
+  --sun:#F6B73C; --sun-soft:#FDEBC4; --sun-ink:#3A2A08;
+  --peach:#F4B79A; --peach-soft:#FCE3D6;
+  --lav:#B9A9EE; --lav-soft:#E9E3FB;
+  --face:#2E2A26; --cheek:#F08A76;
+  --display:"Fredoka","Nunito",ui-rounded,system-ui,sans-serif;
+  --body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1D1B22; --card:#28252E; --ink:#F3EEE7; --muted:#ABA3B4; --line:#37333E;
+  --sun:#F6B73C; --sun-soft:#3E331E; --sun-ink:#2A1E05;
+  --peach:#E8A487; --peach-soft:#3F2E29; --lav:#A795E6; --lav-soft:#332D45;
+  --face:#2A2530; --cheek:#E77F6B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1D1B22; --card:#28252E; --ink:#F3EEE7; --muted:#ABA3B4; --line:#37333E;
+  --sun:#F6B73C; --sun-soft:#3E331E; --sun-ink:#2A1E05;
+  --peach:#E8A487; --peach-soft:#3F2E29; --lav:#A795E6; --lav-soft:#332D45;
+  --face:#2A2530; --cheek:#E77F6B; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:460px;margin:0 auto;padding-block:18px 40px;min-height:100%;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+.muted{color:var(--muted)}
+/* home */
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.date{color:var(--muted);font-weight:700;font-size:14px}
+.hello{font-size:30px;margin-top:6px}
+.lead{color:var(--muted);margin:4px 0 18px}
+.now{border-radius:28px;padding:22px 20px 20px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.now.sun{background:var(--sun-soft)} .now.peach{background:var(--peach-soft)} .now.lav{background:var(--lav-soft)}
+.now .row{display:flex;gap:14px;align-items:center}
+.now .eyebrow{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.now h2{font-size:28px}
+.now .mascot{width:96px;height:96px;flex:none}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;border-radius:999px;font-weight:800;font-size:18px}
+.btn.primary{background:var(--sun);color:var(--sun-ink)}
+.btn.primary:active{transform:scale(.98)}
+.btn.soft{background:var(--card);color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--muted);min-height:44px;font-size:15px}
+.resume{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:12px 12px 12px 16px;margin-bottom:14px}
+.resume b{flex:1;min-width:0}
+.resume button{background:var(--sun);color:var(--sun-ink);font-weight:800;border-radius:999px;padding:8px 16px}
+.section{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:26px 4px 10px}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:22px;padding:10px 10px 10px 12px}
+.item .go{flex:1;display:flex;align-items:center;gap:12px;text-align:left;min-width:0}
+.item .mascot{width:52px;height:52px;flex:none}
+.item h3{font-size:18px}
+.item small{color:var(--muted);font-size:14px;display:block}
+.icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--muted);flex:none}
+.icon-btn:hover{background:var(--bg)}
+.note{margin-top:22px;font-size:14px;color:var(--muted);background:var(--card);border-radius:20px;padding:14px 16px}
+.note summary{font-weight:800;color:var(--ink);cursor:pointer}
+.note code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--bg);padding:1px 6px;border-radius:6px}
+/* focus */
+.fbar{display:flex;align-items:center;gap:12px}
+.track{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .4s}
+.chip{font-size:13px;font-weight:800;border-radius:999px;padding:7px 12px;background:var(--card);color:var(--muted)}
+.chip.on{background:var(--sun);color:var(--sun-ink)}
+.stage{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px;padding-block:20px}
+.step{background:var(--card);border-radius:32px;padding:30px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;min-height:300px;justify-content:center}
+.step .mascot{width:84px;height:84px}
+.step h2{font-size:30px;line-height:1.15}
+.step p{margin:0;color:var(--muted);max-width:30ch}
+.mins{font-size:14px;font-weight:700;color:var(--muted)}
+.timer{display:flex;flex-direction:column;align-items:center;gap:8px}
+.timer svg{width:120px;height:120px}
+.timer .t{font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+.timer button{font-weight:800;border-radius:999px;padding:8px 18px;background:var(--bg)}
+.actions{display:flex;flex-direction:column;gap:10px}
+.actions .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions .pair .btn{min-height:50px;font-size:16px}
+/* done */
+.done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px}
+.done .mascot{width:140px;height:140px}
+.done h1{font-size:44px}
+/* sheet */
+.veil{position:fixed;inset:0;background:rgba(20,16,12,.35);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--bg);width:100%;max-width:480px;border-radius:28px 28px 0 0;padding:22px max(16px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:10px}
+.sheet h3{font-size:22px} .sheet p{margin:0 0 6px;color:var(--muted)}
+/* edit */
+.ehead{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.ehead input{flex:1;min-width:0;font-family:var(--display);font-size:24px;font-weight:600;background:transparent;border:0;color:var(--ink);padding:6px}
+.erow{background:var(--card);border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.erow input[type=text]{width:100%;box-sizing:border-box;font:inherit;font-weight:700;border:0;background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 12px}
+.erow .ctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.erow label{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);font-weight:700}
+.erow input[type=number]{width:56px;font:inherit;border:0;background:var(--bg);color:var(--ink);border-radius:10px;padding:6px 8px}
+.erow .sp{flex:1}
+.erow .icon-btn{width:38px;height:38px}
+.danger{color:#C2483B}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.now .mascot,.step .mascot{animation:bob 4s ease-in-out infinite}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+const LS='moje-rutyny-v2', LSS='moje-rutyny-sesja-v2';
+const DEFAULT={routines:[
+ {id:'rano',name:'Poranek',sub:'Po budziku, pn–pt',kind:'sun',steps:[
+  ['Leki i łyk wody','Jeszcze w łóżku.',1,1],
+  ['Spokojna chwila w łóżku','Wiadomości, coś obejrzeć. Timer przypomni, kiedy wstać.',10,0,10],
+  ['Wstać i otworzyć okno','',1,1],
+  ['Łazienka: toaleta, twarz','',5,1],
+  ['Zmywarkę opróżnić','',5,0],
+  ['Zrobić ciepłe śniadanie','',10,1],
+  ['Zjeść na spokojnie','',15,1],
+  ['Zęby umyć','',3,1],
+  ['Królikom siano i woda','',3,1],
+  ['Ubrać się','Ubrania leżą od wieczora.',8,1],
+  ['Łóżko i rzeczy z nocy na miejsce','Jak w namiocie: tylko to, co widać.',5,0],
+  ['Torba: pudełko z lodówki, klucze, bilet','',3,1],
+  ['Kurtka, buty i wychodzę','',2,1]]},
+ {id:'powrot',name:'Powrót do domu',sub:'Po szkole, gdy złapie WiFi',kind:'peach',steps:[
+  ['Buty i kurtka na swoje miejsce','',2,1],
+  ['Pudełko z torby do zmywarki','',2,1],
+  ['Ręce umyć, przebrać się w domowe','',5,1],
+  ['Woda i coś małego do jedzenia','',5,1],
+  ['Przerwa dla siebie','Leżeć, serial, druty. Timer przypomni o końcu.',30,1,30],
+  ['Rzut oka na wieczór','Co dziś: gotowanie, siłownia, terapia?',2,1],
+  ['Jedna rzecz z Putzplanu','Tylko jedna. Reszta może poczekać.',10,0]]},
+ {id:'wieczor',name:'Wieczór',sub:'1,5 h przed snem',kind:'lav',steps:[
+  ['Rzut oka na jutro','Szkoła, terminy, co chcę zjeść.',3,0],
+  ['Jedzenie na jutro do pudełka','',5,0],
+  ['Torba na jutro przy drzwiach','',5,1],
+  ['Ubrania na jutro wyłożyć','',3,0],
+  ['Coś ciepłego do picia','Herbata, kakao.',5,0],
+  ['Prysznic, zęby, piżama','',15,1],
+  ['Pielęgnacja: twarz, krem','',5,0],
+  ['Telefon na ładowarkę','',1,1],
+  ['Czas dla siebie','Druty, szydełko, książka. Timer przypomni o spaniu.',20,0,20],
+  ['Do łóżka','',1,1]]}
+]};
+function norm(d){d.routines.forEach(r=>{r.steps=r.steps.map((s,i)=>Array.isArray(s)?{id:r.id+'-'+i+'-'+Math.random().toString(36).slice(2,6),t:s[0],h:s[1],min:s[2],core:!!s[3],timer:s[4]||0}:s)});return d}
+const clone=o=>JSON.parse(JSON.stringify(o));
+function load(){try{const v=JSON.parse(localStorage.getItem(LS));if(v&&v.routines)return v}catch(e){}return norm(clone(DEFAULT))}
+function save(){try{localStorage.setItem(LS,JSON.stringify(data))}catch(e){}}
+function loadS(){try{return JSON.parse(localStorage.getItem(LSS))}catch(e){return null}}
+function saveS(){try{session?localStorage.setItem(LSS,JSON.stringify(session)):localStorage.removeItem(LSS)}catch(e){}}
+
+let data=load(), session=loadS(), view='home', editId=null, sheet=null, tick=null, wake=null;
+const app=document.getElementById('app');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const R=id=>data.routines.find(r=>r.id===id);
+
+/* mascots: simple shapes, friendly faces */
+function face(mood,cx,cy,s){
+  const f='var(--face)';
+  const eyes = mood==='sleep'||mood==='calm'
+    ? `<path d="M${cx-14*s} ${cy} q${5*s} ${5*s} ${10*s} 0 M${cx+4*s} ${cy} q${5*s} ${5*s} ${10*s} 0" stroke="${f}" stroke-width="${2.6*s}" fill="none" stroke-linecap="round"/>`
+    : `<ellipse cx="${cx-9*s}" cy="${cy}" rx="${3*s}" ry="${4*s}" fill="${f}"/><ellipse cx="${cx+9*s}" cy="${cy}" rx="${3*s}" ry="${4*s}" fill="${f}"/>`;
+  return eyes+`<path d="M${cx-6*s} ${cy+10*s} q${6*s} ${6*s} ${12*s} 0" stroke="${f}" stroke-width="${2.6*s}" fill="none" stroke-linecap="round"/>
+  <circle cx="${cx-18*s}" cy="${cy+8*s}" r="${3.5*s}" fill="var(--cheek)" opacity=".55"/><circle cx="${cx+18*s}" cy="${cy+8*s}" r="${3.5*s}" fill="var(--cheek)" opacity=".55"/>`;
+}
+function mascot(kind,mood){
+  let body='';
+  if(kind==='sun'){let rays='';for(let i=0;i<8;i++){const a=i*Math.PI/4,x1=50+Math.cos(a)*36,y1=52+Math.sin(a)*36,x2=50+Math.cos(a)*45,y2=52+Math.sin(a)*45;rays+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--sun)" stroke-width="5" stroke-linecap="round"/>`}
+    body=rays+`<circle cx="50" cy="52" r="29" fill="var(--sun)"/>`+face(mood||'happy',50,50,1);}
+  else if(kind==='peach'){body=`<path d="M50 14 L84 42 Q88 46 88 52 L88 78 Q88 88 78 88 L22 88 Q12 88 12 78 L12 52 Q12 46 16 42 Z" fill="var(--peach)" stroke="var(--peach)" stroke-width="6" stroke-linejoin="round"/>`+face(mood||'happy',50,58,1);}
+  else {body=`<circle cx="50" cy="54" r="32" fill="var(--lav)"/><path d="M78 16 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5z" fill="var(--sun)"/>`+face(mood||'sleep',50,52,1);}
+  return `<svg class="mascot" viewBox="0 0 100 100" aria-hidden="true">${body}</svg>`;
+}
+const ICON={
+ edit:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+ x:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+ back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+ up:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
+ down:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+ del:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>',
+ chev:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>'
+};
+function nowId(){const h=new Date().getHours()+new Date().getMinutes()/60;
+  if(h>=4&&h<11)return 'rano'; if(h>=11&&h<19.5)return 'powrot'; return 'wieczor';}
+function steps(r,minimal){return r.steps.filter(s=>!minimal||s.core)}
+const totalMin=(r)=>r.steps.reduce((a,s)=>a+(+s.min||0),0);
+
+/* ---------- views ---------- */
+function vHome(){
+  const d=new Date();
+  const ds=d.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'});
+  const n=R(nowId())||data.routines[0];
+  const resume = session&&R(session.rid) ? `<div class="resume"><b>Trwa: ${esc(R(session.rid).name)}</b><button data-a="resume">Dalej</button></div>`:'';
+  const others=data.routines.filter(r=>r.id!==n.id);
+  return `<div class="top"><span class="date">${esc(ds)}</span></div>
+  <h1 class="hello">Hej, Agata</h1>
+  <p class="lead">Jedna rzecz na raz.</p>
+  ${resume}
+  <section class="now ${n.kind}">
+    <div class="row">${mascot(n.kind)}<div style="min-width:0"><div class="eyebrow">Teraz</div><h2>${esc(n.name)}</h2><div class="muted">ok. ${totalMin(n)} min</div></div></div>
+    <button class="btn primary" data-a="start" data-id="${n.id}">Zacznij</button>
+    <button class="btn ghost" data-a="startmin" data-id="${n.id}">Mało energii? Tylko to, co ważne</button>
+  </section>
+  <div class="section">Inne rutyny</div>
+  <div class="list">${others.map(r=>`<div class="item"><button class="go" data-a="start" data-id="${r.id}">${mascot(r.kind)}<span style="min-width:0"><h3>${esc(r.name)}</h3><small>${esc(r.sub)}</small></span></button>
+     <button class="icon-btn" data-a="edit" data-id="${r.id}" aria-label="Edytuj ${esc(r.name)}">${ICON.edit}</button></div>`).join('')}
+     <div class="item"><button class="go" data-a="edit" data-id="${n.id}"><span class="icon-btn">${ICON.edit}</span><span><h3>Edytuj: ${esc(n.name)}</h3><small>Dodaj, usuń, zmień kolejność</small></span></button></div>
+  </div>
+  <details class="note"><summary>Która rutyna jest „Teraz”?</summary>
+   <p>4:00–11:00 Poranek · 11:00–19:30 Powrót do domu · od 19:30 Wieczór</p></details>`;
+}
+function vFocus(){
+  const r=R(session.rid); if(!r){session=null;saveS();return vHome()}
+  const step=r.steps.find(s=>s.id===session.queue[0]);
+  const total=session.total, left=session.queue.length;
+  const pct=Math.round((total-left)/total*100);
+  let timer='';
+  if(step&&step.timer){
+    const t=session.timer&&session.timer.id===step.id?session.timer:null;
+    timer=`<div class="timer"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/><circle id="ring" cx="60" cy="60" r="52" fill="none" stroke="var(--sun)" stroke-width="10" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="326.7" stroke-dashoffset="0"/><text x="60" y="68" text-anchor="middle" class="t" id="tt" fill="var(--ink)">${step.timer}:00</text></svg>
+    <button data-a="timer" id="tb">${!t?'Start timera':t.paused!=null?'Dalej':'Pauza'}</button></div>`;
+  }
+  return `<div class="fbar"><button class="icon-btn" data-a="exit" aria-label="Zakończ">${ICON.x}</button>
+    <div class="track" aria-hidden="true"><i style="width:${pct}%"></i></div>
+    <button class="chip ${session.minimal?'on':''}" data-a="minimal" aria-pressed="${!!session.minimal}">Minimum</button></div>
+  <div class="stage">
+    <div class="step">${mascot(r.kind)}<h2>${esc(step.t)}</h2>${step.h?`<p>${esc(step.h)}</p>`:''}${!step.timer&&step.min?`<span class="mins">ok. ${step.min} min</span>`:''}${timer}</div>
+    <div class="actions"><button class="btn primary" data-a="fertig">Fertig</button>
+      <div class="pair"><button class="btn soft" data-a="skip">Pomiń</button><button class="btn soft" data-a="later">Później</button></div></div>
+  </div>`;
+}
+function vDone(){const r=R(lastRid)||data.routines[0];
+  return `<div class="done">${mascot(r.kind,'calm')}<h1>Fertig.</h1><p class="muted">${esc(r.name)}</p><button class="btn soft" data-a="home" style="max-width:280px">Wróć</button></div>`}
+function vEdit(){const r=R(editId);
+  return `<div class="ehead"><button class="icon-btn" data-a="home" aria-label="Wróć">${ICON.back}</button><input id="rname" type="text" value="${esc(r.name)}" aria-label="Nazwa rutyny"></div>
+  <div class="list">${r.steps.map((s,i)=>`<div class="erow">
+    <input type="text" id="t-${s.id}" data-f="t" data-i="${i}" value="${esc(s.t)}" aria-label="Krok ${i+1}">
+    <input type="text" id="h-${s.id}" data-f="h" data-i="${i}" value="${esc(s.h)}" placeholder="Podpowiedź (opcjonalnie)" style="font-weight:400" aria-label="Podpowiedź">
+    <div class="ctl"><label>min <input type="number" id="m-${s.id}" data-f="min" data-i="${i}" min="0" max="120" value="${s.min||0}"></label>
+    <label><input type="checkbox" id="c-${s.id}" data-f="core" data-i="${i}" ${s.core?'checked':''}> ważne</label>
+    <label><input type="checkbox" id="x-${s.id}" data-f="timer" data-i="${i}" ${s.timer?'checked':''}> timer</label>
+    <span class="sp"></span>
+    <button class="icon-btn" data-a="mv" data-i="${i}" data-d="-1" aria-label="W górę">${ICON.up}</button>
+    <button class="icon-btn" data-a="mv" data-i="${i}" data-d="1" aria-label="W dół">${ICON.down}</button>
+    <button class="icon-btn danger" data-a="del" data-i="${i}" aria-label="Usuń">${ICON.del}</button></div></div>`).join('')}</div>
+  <div class="actions" style="margin-top:14px"><button class="btn primary" data-a="add">Dodaj krok</button>
+  <button class="btn ghost" data-a="reset">Przywróć domyślną listę</button></div>
+  <p class="muted" style="font-size:14px">„Ważne” = zostaje w trybie „Minimum”.</p>`;
+}
+function vSheet(){
+  if(sheet==='exit')return `<div class="veil" data-a="close"><div class="sheet" role="dialog" aria-label="Zakończyć?"><h3>Zakończyć rutynę?</h3><p>To, co zrobione, zostaje zrobione.</p>
+   <button class="btn primary" data-a="exitok">Zakończ</button><button class="btn ghost" data-a="close">Wróć do rutyny</button></div></div>`;
+  if(sheet==='reset')return `<div class="veil" data-a="close"><div class="sheet" role="dialog"><h3>Przywrócić domyślną listę?</h3><p>Twoje zmiany w tej rutynie znikną.</p>
+   <button class="btn primary" data-a="resetok">Przywróć</button><button class="btn ghost" data-a="close">Anuluj</button></div></div>`;
+  return '';
+}
+let lastRid=null;
+function render(){
+  clearInterval(tick);tick=null;
+  app.innerHTML=(view==='focus'&&session?vFocus():view==='done'?vDone():view==='edit'&&editId?vEdit():vHome())+vSheet();
+  if(view==='focus'&&session&&session.timer){tick=setInterval(updTimer,500);updTimer()}
+  view==='focus'?lock():unlock();
+}
+async function lock(){try{if(!wake&&navigator.wakeLock)wake=await navigator.wakeLock.request('screen')}catch(e){}}
+function unlock(){try{wake&&wake.release()}catch(e){}wake=null}
+
+/* ---------- logic ---------- */
+function start(id,minimal){
+  if(session&&session.rid===id){view='focus';render();return}
+  const r=R(id); if(!r)return;
+  const q=steps(r,minimal).map(s=>s.id); if(!q.length)return;
+  session={rid:id,queue:q,total:q.length,minimal:!!minimal,timer:null};saveS();view='focus';render();window.scrollTo(0,0);
+}
+function next(){
+  session.timer=null;
+  if(!session.queue.length){lastRid=session.rid;session=null;saveS();view='done';render();return}
+  saveS();render();
+}
+function updTimer(){
+  const t=session&&session.timer, el=document.getElementById('tt'), ring=document.getElementById('ring'); if(!t||!el)return;
+  const r=R(session.rid), st=r.steps.find(s=>s.id===t.id); const full=st.timer*60000;
+  const left=Math.max(0,t.paused!=null?t.paused:t.end-Date.now());
+  const m=Math.floor(left/60000), s=Math.floor(left%60000/1000);
+  el.textContent=left>0?`${m}:${String(s).padStart(2,'0')}`:'Już!';
+  ring.setAttribute('stroke-dashoffset',(326.7*(1-left/full)).toFixed(1));
+  if(left<=0&&!t.rang){t.rang=1;saveS();try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}}
+}
+app.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]'); if(!b)return;
+  const a=b.dataset.a;
+  if(a==='close'&&b.classList.contains('veil')&&e.target!==b)return;
+  const r=editId&&R(editId);
+  switch(a){
+   case 'start':start(b.dataset.id,false);break;
+   case 'startmin':start(b.dataset.id,true);break;
+   case 'resume':view='focus';render();break;
+   case 'home':view='home';editId=null;render();break;
+   case 'edit':editId=b.dataset.id;view='edit';render();window.scrollTo(0,0);break;
+   case 'fertig':session.queue.shift();next();break;
+   case 'skip':session.queue.shift();next();break;
+   case 'later':if(session.queue.length>1){session.queue.push(session.queue.shift())}session.timer=null;saveS();render();break;
+   case 'minimal':{const rr=R(session.rid);session.minimal=!session.minimal;
+     if(session.minimal){const core=new Set(rr.steps.filter(s=>s.core).map(s=>s.id));const before=session.queue.length;session.queue=session.queue.filter(id=>core.has(id));session.total-=before-session.queue.length;if(!session.queue.length){next();return}}
+     else{const done=session.total-session.queue.length;const rest=rr.steps.map(s=>s.id).filter(id=>!session.queue.includes(id));/* add back non-core not yet shown at end */const noncore=rr.steps.filter(s=>!s.core&&!session.queue.includes(s.id)&&!(session.seen||[]).includes(s.id)).map(s=>s.id);session.queue=session.queue.concat(noncore);session.total=done+session.queue.length}
+     saveS();render();break;}
+   case 'timer':{const st=R(session.rid).steps.find(s=>s.id===session.queue[0]);const t=session.timer;
+     if(!t||t.id!==st.id)session.timer={id:st.id,end:Date.now()+st.timer*60000,paused:null};
+     else if(t.paused!=null){t.end=Date.now()+t.paused;t.paused=null}
+     else{t.paused=Math.max(0,t.end-Date.now())}
+     saveS();render();break;}
+   case 'exit':sheet='exit';render();break;
+   case 'exitok':sheet=null;session=null;saveS();view='home';render();break;
+   case 'close':sheet=null;render();break;
+   case 'mv':{const i=+b.dataset.i,j=i+ +b.dataset.d;if(j<0||j>=r.steps.length)return;[r.steps[i],r.steps[j]]=[r.steps[j],r.steps[i]];save();render();break;}
+   case 'del':r.steps.splice(+b.dataset.i,1);save();render();break;
+   case 'add':r.steps.push({id:r.id+'-n'+Date.now().toString(36),t:'Nowy krok',h:'',min:5,core:false,timer:0});save();render();
+     setTimeout(()=>{const ins=app.querySelectorAll('.erow input[data-f="t"]');const l=ins[ins.length-1];if(l){l.focus();l.select()}},30);break;
+   case 'reset':sheet='reset';render();break;
+   case 'resetok':{const def=norm(clone(DEFAULT)).routines.find(x=>x.id===editId);if(def){Object.assign(r,def)}sheet=null;save();render();break;}
+  }
+});
+/* track steps already shown so "Minimum" toggle off does not bring back finished ones */
+const _next=next;
+app.addEventListener('click',e=>{},true);
+app.addEventListener('pointerdown',e=>{const b=e.target.closest('[data-a="fertig"],[data-a="skip"]');if(b&&session){session.seen=(session.seen||[]).concat(session.queue[0])}},true);
+app.addEventListener('input',e=>{
+  const el=e.target; const r=editId&&R(editId); if(!r)return;
+  if(el.id==='rname'){r.name=el.value;save();return}
+  const i=+el.dataset.i, f=el.dataset.f; if(!f)return; const s=r.steps[i];
+  if(f==='core')s.core=el.checked; else if(f==='timer')s.timer=el.checked?(+s.min||5):0;
+  else if(f==='min'){s.min=Math.max(0,+el.value||0);if(s.timer)s.timer=s.min||1}
+  else s[f]=el.value;
+  save();
+});
+function fromHash(){let h=(location.hash||'').slice(1);try{const q=new URLSearchParams(location.search).get('r');if(q){h=q;history.replaceState(null,'',location.pathname)}}catch(e){}if(h&&R(h)){start(h,false);return true}return false}
+window.addEventListener('hashchange',fromHash);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&view==='focus'){wake=null;lock()}});
+if(!fromHash()){render()}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
