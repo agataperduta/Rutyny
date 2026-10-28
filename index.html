@@ -301,8 +301,27 @@ function updTimer(){
   const m=Math.floor(left/60000), s=Math.floor(left%60000/1000);
   el.textContent=left>0?`${m}:${String(s).padStart(2,'0')}`:'Już!';
   ring.setAttribute('stroke-dashoffset',(326.7*(1-left/full)).toFixed(1));
-  if(left<=0&&!t.rang){t.rang=1;saveS();try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}}
+  if(left<=0)timerDone();
 }
+/* timer end: notification + vibration + sound, also when the app is in the background */
+let actx=null, endTO=null;
+function initSound(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume&&actx.resume()}catch(e){}}
+function beep(){try{if(!actx)return;const t0=actx.currentTime;[0,0.35,0.7].forEach(d=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0.0001,t0+d);g.gain.exponentialRampToValueAtTime(0.3,t0+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+d+0.28);o.connect(g).connect(actx.destination);o.start(t0+d);o.stop(t0+d+0.3)})}catch(e){}}
+function askNotify(){try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(e){}}
+function notifyDone(st,r){
+  try{navigator.vibrate&&navigator.vibrate([400,150,400,150,400])}catch(e){}
+  beep();
+  try{if('Notification' in window&&Notification.permission==='granted'&&navigator.serviceWorker){
+    navigator.serviceWorker.ready.then(reg=>reg.showNotification('Czas minął ⏰',{body:st.t+' · '+r.name+'. Możesz iść dalej.',tag:'rutyny-timer',renotify:true,requireInteraction:true,vibrate:[400,150,400,150,400],icon:'icon-192.png',badge:'icon-192.png',data:{url:'./'}}))}}catch(e){}
+}
+function timerDone(){
+  const t=session&&session.timer; if(!t||t.paused!=null||t.rang)return;
+  if(Date.now()<t.end){scheduleEnd();return}
+  const r=R(session.rid), st=r&&r.steps.find(s=>s.id===t.id); if(!st)return;
+  t.rang=1;saveS();notifyDone(st,r);
+}
+function scheduleEnd(){clearTimeout(endTO);const t=session&&session.timer;if(t&&t.paused==null&&!t.rang)endTO=setTimeout(timerDone,Math.max(0,t.end-Date.now())+150)}
+setInterval(timerDone,5000);
 app.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]'); if(!b)return;
   const a=b.dataset.a;
@@ -322,10 +341,11 @@ app.addEventListener('click',e=>{
      else{const done=session.total-session.queue.length;const rest=rr.steps.map(s=>s.id).filter(id=>!session.queue.includes(id));/* add back non-core not yet shown at end */const noncore=rr.steps.filter(s=>!s.core&&!session.queue.includes(s.id)&&!(session.seen||[]).includes(s.id)).map(s=>s.id);session.queue=session.queue.concat(noncore);session.total=done+session.queue.length}
      saveS();render();break;}
    case 'timer':{const st=R(session.rid).steps.find(s=>s.id===session.queue[0]);const t=session.timer;
+     initSound();askNotify();
      if(!t||t.id!==st.id)session.timer={id:st.id,end:Date.now()+st.timer*60000,paused:null};
      else if(t.paused!=null){t.end=Date.now()+t.paused;t.paused=null}
      else{t.paused=Math.max(0,t.end-Date.now())}
-     saveS();render();break;}
+     saveS();scheduleEnd();render();break;}
    case 'exit':sheet='exit';render();break;
    case 'exitok':sheet=null;session=null;saveS();view='home';render();break;
    case 'close':sheet=null;render();break;
@@ -352,7 +372,8 @@ app.addEventListener('input',e=>{
 });
 function fromHash(){let h=(location.hash||'').slice(1);try{const q=new URLSearchParams(location.search).get('r');if(q){h=q;history.replaceState(null,'',location.pathname)}}catch(e){}if(h&&R(h)){start(h,false);return true}return false}
 window.addEventListener('hashchange',fromHash);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&view==='focus'){wake=null;lock()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){timerDone();if(view==='focus'){wake=null;lock()}}});
+scheduleEnd();
 if(!fromHash()){render()}
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 </script>
