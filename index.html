@@ -128,7 +128,6 @@ const LS='moje-rutyny-v2', LSS='moje-rutyny-sesja-v2';
 const DEFAULT={routines:[
  {id:'rano',name:'Poranek',sub:'Po budziku, pn–pt',kind:'sun',steps:[
   ['Leki i łyk wody','Jeszcze w łóżku.',1,1],
-  ['Spokojna chwila w łóżku','Wiadomości, coś obejrzeć. Timer przypomni, kiedy wstać.',10,0,10],
   ['Wstać i otworzyć okno','',1,1],
   ['Łazienka: toaleta, twarz','',5,1],
   ['Zmywarkę opróżnić','',5,0],
@@ -162,7 +161,10 @@ const DEFAULT={routines:[
 ]};
 function norm(d){d.routines.forEach(r=>{r.steps=r.steps.map((s,i)=>Array.isArray(s)?{id:r.id+'-'+i+'-'+Math.random().toString(36).slice(2,6),t:s[0],h:s[1],min:s[2],core:!!s[3],timer:s[4]||0}:s)});return d}
 const clone=o=>JSON.parse(JSON.stringify(o));
-function load(){try{const v=JSON.parse(localStorage.getItem(LS));if(v&&v.routines)return v}catch(e){}return norm(clone(DEFAULT))}
+function migrate(v){
+  if(!(v.mig>=1)){const r=v.routines.find(x=>x.id==='rano');if(r)r.steps=r.steps.filter(st=>!(st.timer>0&&/łóżk/i.test(st.t||'')));v.mig=1}
+  return v}
+function load(){try{const v=JSON.parse(localStorage.getItem(LS));if(v&&v.routines){const m=migrate(v);try{localStorage.setItem(LS,JSON.stringify(m))}catch(e){}return m}}catch(e){}const d=norm(clone(DEFAULT));d.mig=1;return d}
 function save(){try{localStorage.setItem(LS,JSON.stringify(data))}catch(e){}}
 function loadS(){try{return JSON.parse(localStorage.getItem(LSS))}catch(e){return null}}
 function saveS(){try{session?localStorage.setItem(LSS,JSON.stringify(session)):localStorage.removeItem(LSS)}catch(e){}}
@@ -229,6 +231,11 @@ function vHome(){
 }
 function vFocus(){
   const r=R(session.rid); if(!r){session=null;saveS();return vHome()}
+  const ids=new Set(r.steps.map(s=>s.id)); const before=session.queue.length;
+  session.queue=session.queue.filter(id=>ids.has(id)); session.total-=before-session.queue.length;
+  if(session.timer&&!ids.has(session.timer.id))session.timer=null;
+  if(!session.queue.length){lastRid=session.rid;session=null;saveS();view='done';return vDone()}
+  saveS();
   const step=r.steps.find(s=>s.id===session.queue[0]);
   const total=session.total, left=session.queue.length;
   const pct=Math.round((total-left)/total*100);
@@ -275,7 +282,8 @@ function vSheet(){
 let lastRid=null;
 function render(){
   clearInterval(tick);tick=null;
-  app.innerHTML=(view==='focus'&&session?vFocus():view==='done'?vDone():view==='edit'&&editId?vEdit():vHome())+vSheet();
+  try{app.innerHTML=(view==='focus'&&session?vFocus():view==='done'?vDone():view==='edit'&&editId?vEdit():vHome())+vSheet();}
+  catch(err){console.error(err);session=null;saveS();view='home';editId=null;sheet=null;app.innerHTML=vHome();}
   if(view==='focus'&&session&&session.timer){tick=setInterval(updTimer,500);updTimer()}
   view==='focus'?lock():unlock();
 }
