@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Samopoczucie</title>
+<meta name="theme-color" content="#F6F3FC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1D1B22" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+:root{
+  --bg:#F6F3FC; --card:#FFFFFF; --ink:#2E2A26; --muted:#746C80; --line:#E9E3F3;
+  --lav:#B9A9EE; --lav-soft:#E9E3FB; --acc:#7F6AD6; --acc-ink:#FFFFFF;
+  --sun:#F6B73C; --face:#2E2A26; --cheek:#F08A76;
+  --hyper:#E5826A; --hypo:#6F95D6; --ok:#6FAE7A; --okband:rgba(111,174,122,.16);
+  --pos:#6FAE7A; --neg:#C2789B; --done:#E3F1E2; --done-ink:#2F5B35; --warn:#FBE7DF; --warn-ink:#8A3B25;
+  --display:"Fredoka","Nunito",ui-rounded,system-ui,sans-serif;
+  --body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#1D1B22; --card:#28252E; --ink:#F3EEE7; --muted:#ABA3B4; --line:#37333E;
+  --lav:#A795E6; --lav-soft:#332D45; --acc:#A08DF0; --acc-ink:#1D1B22;
+  --face:#2A2530; --cheek:#E77F6B; --okband:rgba(111,174,122,.20);
+  --done:#24382A; --done-ink:#BFE3C3; --warn:#45291F; --warn-ink:#F6C6B4; color-scheme:dark}}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:460px;margin:0 auto;padding-block:18px 40px;min-height:100%}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:var(--acc);font-weight:700}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+p{margin:0}
+.muted{color:var(--muted)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px}
+.date{color:var(--muted);font-weight:700;font-size:14px}
+.hello{font-size:30px;margin-top:4px}
+.lead{color:var(--muted);margin:2px 0 16px}
+.icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--muted);flex:none}
+.icon-btn:active{background:var(--line)}
+.card{background:var(--card);border-radius:24px;padding:18px}
+.card + .card{margin-top:12px}
+.rec{background:var(--lav-soft);border-radius:30px;padding:22px 18px 18px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.mic{width:128px;height:128px;border-radius:50%;background:var(--lav);display:grid;place-items:center;color:#2B2350;position:relative;transition:transform .15s}
+.mic:active{transform:scale(.96)}
+.mic svg{width:52px;height:52px}
+.mic.on{background:var(--hyper);color:#fff}
+.mic.on::before,.mic.on::after{content:"";position:absolute;inset:-10px;border-radius:50%;border:3px solid var(--hyper);opacity:.5;animation:pulse 1.6s ease-out infinite}
+.mic.on::after{animation-delay:.8s}
+@keyframes pulse{from{transform:scale(.9);opacity:.6}to{transform:scale(1.25);opacity:0}}
+@media (prefers-reduced-motion:reduce){.mic.on::before,.mic.on::after{animation:none}}
+.mic-label{font-weight:800;color:var(--ink);text-align:center}
+textarea{width:100%;min-height:120px;resize:vertical;border:2px solid transparent;border-radius:20px;background:var(--card);color:var(--ink);font:inherit;padding:14px 16px;line-height:1.45}
+textarea:focus{border-color:var(--lav);outline:none}
+input[type=text],input[type=password]{width:100%;border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);font:inherit;padding:12px 14px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;border-radius:999px;font-weight:800;font-size:17px;text-decoration:none}
+.btn.primary{background:var(--acc);color:var(--acc-ink)}
+.btn.primary:disabled{opacity:.45;cursor:default}
+.btn.soft{background:var(--card);color:var(--ink)}
+.btn.line{background:transparent;border:2px solid var(--line);color:var(--ink)}
+.btn.small{min-height:44px;font-size:15px}
+.hint{font-size:14px;color:var(--muted);text-align:center}
+.ok{background:var(--done);color:var(--done-ink);border-radius:20px;padding:14px 16px;font-weight:700;margin-top:12px;display:flex;gap:10px;align-items:flex-start}
+.warn{background:var(--warn);color:var(--warn-ink);border-radius:20px;padding:12px 16px;font-weight:600;margin-top:12px;font-size:15px}
+.status{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pill{font-size:13px;font-weight:800;border-radius:999px;padding:6px 12px;background:var(--card);color:var(--muted)}
+.section{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:26px 4px 10px}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:22px;padding:14px 12px 14px 16px;text-align:left;width:100%}
+.item .t{flex:1;min-width:0}
+.item h3{font-size:18px}
+.item small{color:var(--muted);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item .dot{width:12px;height:12px;border-radius:50%;flex:none}
+.empty{background:var(--card);border-radius:22px;padding:16px;color:var(--muted);font-size:15px}
+.mascot{width:96px;height:96px}
+/* detail */
+.dhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dhead h1{font-size:24px;flex:1}
+.card h2{font-size:19px;margin-bottom:8px}
+.sum{font-size:17px}
+.chart{width:100%;height:auto;display:block;margin-top:4px}
+.chart text{font-family:var(--body);font-size:10px;fill:var(--muted);font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.tl{display:flex;flex-direction:column}
+.tl .row{display:grid;grid-template-columns:50px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.tl .row:first-child{border-top:0;padding-top:4px}
+.tl .time{font-weight:800}
+.tl .dir{font-size:13px;font-weight:800}
+.tl .dir.gora{color:var(--hyper)} .tl .dir.dol{color:var(--hypo)} .tl .dir.stabilnie{color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.chips span{font-size:13px;font-weight:700;background:var(--lav-soft);border-radius:999px;padding:3px 10px}
+.tl .note{font-size:14px;color:var(--muted)}
+ul.clean{margin:0;padding-left:20px} ul.clean li{margin:6px 0}
+.foot{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:12px}
+.steps .card h2::before{counter-increment:s;content:counter(s) ". "}
+.setting{display:flex;flex-direction:column;gap:10px}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.kv b{text-align:right}
+.days{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<script>
+'use strict';
+/* ---------- stałe ---------- */
+const REPO = 'agataperduta/samopoczucie';
+const API = 'https://api.github.com/repos/' + REPO + '/';
+const VAPID = 'BKLgsi5u41Js7b2kv9a9veDg796dz1MQ-ewOEJypZ9w0Y0cxFQ6cJZejRXxUY-7GdrAETGURvfafO08GOPItm4s';
+const PLAN = { dni: ['2026-11-10', '2026-11-11', '2026-11-12'], godziny: ['07:00', '08:00', '10:15', '12:00', '14:00', '16:00', '17:00', '18:00', '19:00'] };
+const TOKEN_URL = 'https://github.com/settings/personal-access-tokens/new?name=Samopoczucie&description=Apka%20Samopoczucie%20zapisuje%20wpisy&target_name=agataperduta&expires_in=30&contents=write';
+
+/* ---------- pamięć telefonu ---------- */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('sp.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('sp.' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('sp.' + k); } catch (e) {} }
+};
+
+const S = {
+  view: 'home', token: LS.get('token', ''), queue: LS.get('queue', []), summaries: LS.get('summaries', {}),
+  detail: null, listening: false, text: LS.get('draft', ''), saved: false, fromAlert: false,
+  micErr: '', setupErr: '', pushMsg: '', netErr: '', busy: false, installEvt: null
+};
+
+/* ---------- daty ---------- */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const hm = d => pad(d.getHours()) + ':' + pad(d.getMinutes());
+function isoLocal(d) {
+  const off = -d.getTimezoneOffset(), s = off >= 0 ? '+' : '-', a = Math.abs(off);
+  return ymd(d) + 'T' + hm(d) + ':' + pad(d.getSeconds()) + s + pad(Math.floor(a / 60)) + ':' + pad(a % 60);
+}
+const plDate = (key, opts) => new Date(key + 'T12:00:00').toLocaleDateString('pl-PL', opts || { weekday: 'long', day: 'numeric', month: 'long' });
+const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function nextReminder() {
+  const now = new Date(), today = ymd(now), nowM = now.getHours() * 60 + now.getMinutes();
+  for (const d of PLAN.dni) {
+    if (d < today) continue;
+    for (const g of PLAN.godziny) {
+      if (d === today && toMin(g) <= nowM) continue;
+      return d === today ? g : plDate(d, { weekday: 'short' }) + ' ' + g;
+    }
+  }
+  return null;
+}
+
+/* ---------- GitHub ---------- */
+function gh(path, opt) {
+  opt = opt || {};
+  const h = { 'Authorization': 'Bearer ' + S.token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  if (opt.body) h['Content-Type'] = 'application/json';
+  return fetch(API + path, { method: opt.method || 'GET', headers: h, body: opt.body, cache: 'no-store' });
+}
+function b64(s) { const b = new TextEncoder().encode(s); let bin = ''; for (const x of b) bin += String.fromCharCode(x); return btoa(bin); }
+function unb64(s) { const bin = atob(String(s).replace(/\s/g, '')); return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))); }
+async function putFile(path, obj, message) {
+  let sha;
+  const g = await gh('contents/' + path);
+  if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) throw g.status;
+  const r = await gh('contents/' + path, { method: 'PUT', body: JSON.stringify(Object.assign({ message, content: b64(JSON.stringify(obj, null, 2) + '\n') }, sha ? { sha } : {})) });
+  if (!r.ok) throw r.status;
+  return r.json();
+}
+function errText(code) {
+  if (code === 401) return 'Klucz jest zły albo wygasł. Ustawienia → Zmień klucz.';
+  if (code === 403) return 'Klucz nie może zapisywać. Przy tworzeniu klucza ustaw „Contents: Read and write”.';
+  if (code === 404) return 'Klucz nie widzi repo „samopoczucie”. Przy tworzeniu klucza wybierz je w „Repository access”.';
+  if (code === 'net') return 'Brak internetu.';
+  return 'Coś poszło nie tak (' + code + ').';
+}
+
+/* ---------- kolejka wpisów (działa też bez internetu) ---------- */
+let flushing = false;
+async function flush() {
+  if (flushing || !S.token || !S.queue.length) return;
+  flushing = true; S.netErr = '';
+  try {
+    while (S.queue.length) {
+      const e = S.queue[0];
+      const r = await gh('contents/wpisy/' + e.dzien + '/' + e.plik, { method: 'PUT', body: JSON.stringify({ message: 'Wpis ' + e.dzien + ' ' + e.godz, content: b64(JSON.stringify(e.dane, null, 2) + '\n') }) });
+      if (r.ok || r.status === 422) { S.queue.shift(); LS.set('queue', S.queue); }
+      else { S.netErr = errText(r.status); break; }
+    }
+  } catch (err) { S.netErr = ''; /* brak sieci: spróbujemy później */ }
+  flushing = false; render();
+}
+addEventListener('online', flush);
+
+function save() {
+  const t = S.text.trim();
+  if (!t) return;
+  if (S.listening) { ignoreResults = true; stopListening(true); }
+  const d = new Date();
+  const plik = hm(d).replace(':', '-') + '-' + pad(d.getSeconds()) + '-' + Math.random().toString(36).slice(2, 6) + '.json';
+  S.queue.push({ dzien: ymd(d), godz: hm(d), plik, dane: { czas: isoLocal(d), tekst: t, zrodlo: S.fromAlert ? 'powiadomienie' : 'sama' } });
+  LS.set('queue', S.queue);
+  const c = LS.get('count', {}); const n = c.dzien === ymd(d) ? c.n + 1 : 1; LS.set('count', { dzien: ymd(d), n });
+  S.text = ''; LS.del('draft'); S.saved = true; S.fromAlert = false; S.micErr = '';
+  render(); flush();
+}
+function todayCount() { const c = LS.get('count', {}); return c.dzien === ymd(new Date()) ? c.n : 0; }
+
+/* ---------- mówienie (rozpoznawanie mowy w Chrome) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, base = '', parts = [], emptyEnds = 0, ignoreResults = false;
+function joinParts(list) {
+  const ps = [];
+  for (const raw of list) {
+    const t = raw.trim(); if (!t) continue;
+    const last = ps[ps.length - 1];
+    if (last && t.toLowerCase().startsWith(last.toLowerCase())) ps[ps.length - 1] = t; else ps.push(t);
+  }
+  return ps;
+}
+function startListening() {
+  if (!SR) return;
+  base = S.text.trim() ? S.text.trim() + ' ' : '';
+  parts = []; emptyEnds = 0; ignoreResults = false; S.listening = true; S.micErr = ''; S.saved = false;
+  render(); newRec();
+}
+function newRec() {
+  let sess = [];
+  rec = new SR();
+  rec.lang = 'pl-PL'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    if (ignoreResults) return;
+    const all = []; for (let i = 0; i < e.results.length; i++) all.push(e.results[i][0].transcript);
+    sess = joinParts(all);
+    S.text = (base + joinParts([...parts, ...sess]).join(' ')).replace(/\s+/g, ' ').trimStart();
+    syncText();
+  };
+  rec.onerror = e => {
+    const m = { 'not-allowed': 'Apka nie ma dostępu do mikrofonu. Zezwól na mikrofon albo użyj 🎤 na klawiaturze.', 'service-not-allowed': 'Rozpoznawanie mowy jest wyłączone. Użyj 🎤 na klawiaturze.', 'network': 'Rozpoznawanie mowy potrzebuje internetu. Możesz pisać albo użyć 🎤 na klawiaturze.', 'audio-capture': 'Nie słyszę mikrofonu.' }[e.error];
+    if (m) { S.micErr = m; S.listening = false; }
+  };
+  rec.onend = () => {
+    if (sess.length) { parts = joinParts([...parts, ...sess]); emptyEnds = 0; } else emptyEnds++;
+    if (S.listening && emptyEnds < 2) { try { newRec(); return; } catch (_) {} }
+    const selfEnded = S.listening; // skończyło się samo (cisza), a nie przyciskiem
+    S.listening = false; LS.set('draft', S.text);
+    if (selfEnded) render(); else syncText();
+  };
+  try { rec.start(); } catch (_) {}
+}
+function stopListening(quiet) { S.listening = false; try { rec && rec.stop(); } catch (_) {} LS.set('draft', S.text); if (!quiet) render(); }
+function syncText() {
+  const ta = document.getElementById('txt'); if (ta && ta.value !== S.text) { ta.value = S.text; ta.scrollTop = ta.scrollHeight; }
+  const b = document.getElementById('saveBtn'); if (b) b.disabled = !S.text.trim();
+}
+
+/* ---------- powiadomienia ---------- */
+function keyBytes(k) { const s = (k + '='.repeat((4 - k.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+function pushSupported() { return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window; }
+async function enablePush(silent) {
+  if (!pushSupported()) { if (!silent) S.pushMsg = 'Tutaj powiadomienia nie działają. Otwórz apkę w Chrome na telefonie.'; render(); return; }
+  try {
+    const p = silent ? Notification.permission : await Notification.requestPermission();
+    if (p !== 'granted') { if (!silent) S.pushMsg = 'Powiadomienia są zablokowane. Przytrzymaj ikonkę apki → ⓘ Informacje → Powiadomienia → włącz.'; render(); return; }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (sub && sub.options && sub.options.applicationServerKey) {
+      const a = new Uint8Array(sub.options.applicationServerKey), b = keyBytes(VAPID);
+      if (a.length !== b.length || a.some((x, i) => x !== b[i])) { await sub.unsubscribe(); sub = null; }
+    }
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(VAPID) });
+    if (LS.get('subEndpoint', '') !== sub.endpoint) {
+      await putFile('config/subskrypcja.json', Object.assign(sub.toJSON(), { zapisano: isoLocal(new Date()) }), 'Subskrypcja powiadomień');
+      LS.set('subEndpoint', sub.endpoint);
+    }
+    if (!silent) S.pushMsg = 'Powiadomienia włączone ✓';
+  } catch (e) {
+    if (!silent) S.pushMsg = typeof e === 'number' ? errText(e) : 'Nie udało się włączyć powiadomień. Spróbuj jeszcze raz.';
+  }
+  render();
+}
+function pushOn() { return pushSupported() && Notification.permission === 'granted' && !!LS.get('subEndpoint', ''); }
+async function testNotification() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    await reg.showNotification('💭 Jak się czujesz?', { body: 'Tak będzie wyglądać przypomnienie.', icon: 'icon-192.png', badge: 'badge-96.png', tag: 'samopoczucie-test', vibrate: [300, 120, 300], data: { url: './?z=alert' } });
+    S.pushMsg = 'Testowe powiadomienie wysłane. Jeśli nic nie wyskoczyło, sprawdź ustawienia powiadomień telefonu.';
+  } catch (e) { S.pushMsg = 'Najpierw włącz powiadomienia.'; }
+  render();
+}
+
+/* ---------- podsumowania od Claude ---------- */
+async function loadSummaries() {
+  if (!S.token) return;
+  try {
+    const r = await gh('contents/podsumowania');
+    if (!r.ok) return;
+    const list = (await r.json()).filter(f => f.name.endsWith('.json'));
+    let changed = false;
+    for (const f of list) {
+      const key = f.name.replace(/\.json$/, '');
+      if (S.summaries[key] && S.summaries[key]._sha === f.sha) continue;
+      const g = await gh('contents/podsumowania/' + encodeURIComponent(f.name));
+      if (!g.ok) continue;
+      try { const data = JSON.parse(unb64((await g.json()).content)); data._sha = f.sha; S.summaries[key] = data; changed = true; } catch (_) {}
+    }
+    for (const k of Object.keys(S.summaries)) if (!list.some(f => f.name === k + '.json')) { delete S.summaries[k]; changed = true; }
+    if (changed) { LS.set('summaries', S.summaries); render(); }
+  } catch (_) {}
+}
+
+/* ---------- połączenie (klucz) ---------- */
+async function connect() {
+  const inp = document.getElementById('tok');
+  const t = (inp && inp.value || '').trim();
+  if (!t) { S.setupErr = 'Wklej klucz z GitHuba.'; render(); return; }
+  S.busy = true; S.setupErr = ''; render();
+  const old = S.token; S.token = t;
+  try {
+    await putFile('config/polaczenie.json', { polaczono: isoLocal(new Date()), urzadzenie: navigator.userAgent.slice(0, 120) }, 'Połączenie apki');
+    LS.set('token', t); S.view = 'home';
+    loadSummaries(); flush();
+    if (pushSupported() && Notification.permission === 'granted') enablePush(true);
+  } catch (e) {
+    S.token = old; S.setupErr = typeof e === 'number' ? errText(e) : errText('net');
+  }
+  S.busy = false; render();
+}
+function disconnect() { S.token = ''; LS.del('token'); LS.del('subEndpoint'); S.view = 'home'; render(); }
+
+/* ---------- rysunki ---------- */
+const MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const STOP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2.5"/></svg>';
+const GEAR = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
+const BACK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+const CHEV = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+function cloud(cls) {
+  return `<svg class="${cls || 'mascot'}" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 340 Q96 340 96 288 Q96 238 148 232 Q152 168 216 160 Q262 116 316 150 Q376 140 392 204 Q440 214 438 270 Q436 340 366 340 Z" fill="var(--lav)"/><ellipse cx="226" cy="252" rx="13" ry="17" fill="var(--face)"/><ellipse cx="300" cy="252" rx="13" ry="17" fill="var(--face)"/><path d="M238 290 q25 22 50 0" stroke="var(--face)" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="190" cy="286" r="15" fill="var(--cheek)" opacity=".55"/><circle cx="336" cy="286" r="15" fill="var(--cheek)" opacity=".55"/><path d="M372 118 l9 22 22 9 -22 9 -9 22 -9 -22 -22 -9 22 -9z" fill="var(--sun)"/></svg>`;
+}
+const zoneColor = v => v >= 7 ? 'var(--hyper)' : v <= 3 ? 'var(--hypo)' : 'var(--ok)';
+const pts = s => (s && Array.isArray(s.punkty) ? s.punkty : []).filter(p => p && p.czas && isFinite(+p.pobudzenie)).map(p => Object.assign({}, p, { m: toMin(p.czas) })).sort((a, b) => a.m - b.m);
+
+function xRange(series) {
+  let lo = 7 * 60, hi = 20 * 60;
+  for (const s of series) for (const p of s) { lo = Math.min(lo, p.m); hi = Math.max(hi, p.m); }
+  return [Math.floor(lo / 60) * 60, Math.ceil(hi / 60) * 60];
+}
+function axisX(lo, hi, X, H, B, W) {
+  let out = '';
+  const step = hi - lo > 13 * 60 ? 180 : 120;
+  for (let m = Math.ceil(lo / step) * step; m <= hi; m += step) {
+    const x = X(m), anchor = x > W - 14 ? "end" : "middle";
+    out += `<text x="${(anchor === 'end' ? W - 2 : x).toFixed(1)}" y="${H - B + 16}" text-anchor="${anchor}">${m / 60}:00</text>`;
+  }
+  return out;
+}
+function yLabel(x, y, txt, col) { return `<text x="${x}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" style="fill:${col}">${txt}</text>`; }
+function chartPobudzenie(series, colors) {
+  const W = 340, H = 200, L = 82, R = 16, T = 10, B = 26;
+  const [lo, hi] = xRange(series);
+  const X = m => L + (m - lo) / Math.max(1, hi - lo) * (W - L - R);
+  const Y = v => T + (10 - v) / 10 * (H - T - B);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Pobudzenie w ciągu dnia">`;
+  s += `<rect x="${L}" y="${Y(6.5)}" width="${W - L - R}" height="${Y(3.5) - Y(6.5)}" fill="var(--okband)" rx="6"/>`;
+  s += `<line x1="${L}" x2="${W - R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-width="1"/>`;
+  s += yLabel(L - 6, Y(9), '↑ napięcie', 'var(--hyper)') + yLabel(L - 6, Y(5), 'w oknie', 'var(--ok)') + yLabel(L - 6, Y(1), '↓ zgaszenie', 'var(--hypo)');
+  series.forEach((p, i) => {
+    if (!p.length) return;
+    const col = colors ? colors[i] : 'var(--acc)';
+    s += `<path d="${p.map((q, j) => (j ? 'L' : 'M') + X(q.m).toFixed(1) + ' ' + Y(+q.pobudzenie).toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="${colors ? .9 : .55}"/>`;
+    for (const q of p) s += `<circle cx="${X(q.m).toFixed(1)}" cy="${Y(+q.pobudzenie).toFixed(1)}" r="${colors ? 4 : 6}" fill="${colors ? col : zoneColor(+q.pobudzenie)}" stroke="var(--card)" stroke-width="2"/>`;
+  });
+  return s + axisX(lo, hi, X, H, B, W) + '</svg>';
+}
+function chartNastroj(p) {
+  const W = 340, H = 150, L = 82, R = 16, T = 10, B = 26;
+  const [lo, hi] = xRange([p]);
+  const X = m => L + (m - lo) / Math.max(1, hi - lo) * (W - L - R);
+  const Y = v => T + (5 - v) / 10 * (H - T - B);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Nastrój w ciągu dnia">`;
+  s += `<line x1="${L}" x2="${W - R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-width="2"/>`;
+  s += yLabel(L - 6, Y(4), 'przyjemnie', 'var(--pos)') + yLabel(L - 6, Y(0), 'neutralnie', 'var(--muted)') + yLabel(L - 6, Y(-4), 'nieprzyjemnie', 'var(--neg)');
+  for (const q of p) {
+    const v = Math.max(-5, Math.min(5, +q.nastroj || 0)), x = X(q.m), y0 = Y(0), y1 = Y(v);
+    s += `<rect x="${(x - 5).toFixed(1)}" y="${Math.min(y0, y1).toFixed(1)}" width="10" height="${Math.max(2, Math.abs(y1 - y0)).toFixed(1)}" rx="4" fill="${v >= 0 ? 'var(--pos)' : 'var(--neg)'}"/>`;
+  }
+  return s + axisX(lo, hi, X, H, B, W) + '</svg>';
+}
+const DIR = { gora: '↑ w górę', dol: '↓ w dół', stabilnie: '→ stabilnie' };
+
+/* ---------- widoki ---------- */
+function vSetup() {
+  return `<div class="top"><span class="date">${esc(plDate(ymd(new Date())))}</span></div>
+  <div style="display:flex;justify-content:center;margin:6px 0 4px">${cloud()}</div>
+  <h1 class="hello" style="text-align:center">Połącz apkę z Claude</h1>
+  <p class="lead" style="text-align:center">Wpisy trafiają do Twojego prywatnego repo „samopoczucie” na GitHubie. Czytacie je tylko Ty i Claude.</p>
+  <div class="steps">
+    <div class="card setting"><h2>Utwórz klucz</h2>
+      <a class="btn primary" href="${TOKEN_URL}" target="_blank" rel="noopener">Otwórz GitHuba</a>
+      <p class="muted" style="font-size:15px">Na stronie: w <b>Repository access</b> wybierz <b>Only select repositories</b> → <b>samopoczucie</b>. Sprawdź, czy w <b>Permissions</b> jest <b>Contents: Read and write</b>. Na dole <b>Generate token</b> → skopiuj klucz.</p>
+    </div>
+    <div class="card setting"><h2>Wklej klucz</h2>
+      <input id="tok" type="password" autocomplete="off" placeholder="github_pat_…" aria-label="Klucz z GitHuba">
+      <button class="btn primary" id="connBtn" ${S.busy ? 'disabled' : ''}>${S.busy ? 'Sprawdzam…' : 'Połącz'}</button>
+      ${S.setupErr ? `<div class="warn">${esc(S.setupErr)}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function vHome() {
+  const now = new Date();
+  const n = todayCount(), nxt = nextReminder();
+  const keys = Object.keys(S.summaries).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
+  const all = S.summaries.calosc;
+  const listening = S.listening;
+  let h = `<div class="top"><span class="date">${esc(plDate(ymd(now)))}</span><button class="icon-btn" data-go="settings" aria-label="Ustawienia">${GEAR}</button></div>
+  <h1 class="hello">Hej, Agata</h1>
+  <p class="lead">${S.fromAlert ? 'Krótka chwila dla siebie. ' : ''}Jak się teraz czujesz?</p>`;
+  if (!pushOn() && pushSupported()) h += `<div class="card setting" style="margin-bottom:12px"><b>Włącz przypomnienia</b><span class="muted" style="font-size:15px">Żeby apka mogła co godzinę (w szkole w przerwach) zapytać, jak się czujesz.</span><button class="btn primary small" data-act="push">Włącz powiadomienia</button>${S.pushMsg ? `<div class="warn">${esc(S.pushMsg)}</div>` : ''}</div>`;
+  h += `<section class="rec">
+    ${SR ? `<button class="mic${listening ? ' on' : ''}" data-act="mic" aria-pressed="${listening}" aria-label="${listening ? 'Zakończ mówienie' : 'Mów'}">${listening ? STOP : MIC}</button>
+    <div class="mic-label">${listening ? 'Słucham… stuknij, żeby skończyć' : 'Stuknij i powiedz, co czujesz'}</div>` : `<div class="mic-label">Stuknij w pole i użyj 🎤 na klawiaturze</div>`}
+    <textarea id="txt" placeholder="Co czujesz i co się teraz dzieje? Nie musisz oceniać, na jakim jesteś poziomie." aria-label="Twój wpis">${esc(S.text)}</textarea>
+    <button class="btn primary" id="saveBtn" data-act="save" ${S.text.trim() ? '' : 'disabled'}>Zapisz</button>
+    ${S.micErr ? `<div class="warn" style="margin-top:0">${esc(S.micErr)}</div>` : ''}
+    <p class="hint">W ciągu dnia nie widzisz wpisów. Rano Claude zrobi z nich podsumowanie.</p>
+  </section>`;
+  if (S.saved) h += `<div class="ok" role="status"><span>✓</span><span>Zapisane. Dziękuję, że się zatrzymałaś.${S.queue.length ? ' Wyślę, jak będzie internet.' : ''}</span></div>`;
+  if (S.netErr) h += `<div class="warn">${esc(S.netErr)}</div>`;
+  h += `<div class="status">${n ? `<span class="pill">Dziś: ${n} ${n === 1 ? 'wpis' : n < 5 ? 'wpisy' : 'wpisów'}</span>` : ''}${S.queue.length ? `<span class="pill">Czeka na internet: ${S.queue.length}</span>` : ''}${nxt ? `<span class="pill">Następne przypomnienie: ${esc(nxt)}</span>` : ''}</div>`;
+  h += `<div class="section">Podsumowania</div><div class="list">`;
+  if (all) h += `<button class="item" data-sum="calosc"><span class="dot" style="background:var(--sun)"></span><span class="t"><h3>Całe 3 dni</h3><small>${esc(all.streszczenie || '')}</small></span>${CHEV}</button>`;
+  for (const k of keys) {
+    const s = S.summaries[k], p = pts(s);
+    const avg = p.length ? p.reduce((a, q) => a + +q.pobudzenie, 0) / p.length : 5;
+    h += `<button class="item" data-sum="${esc(k)}"><span class="dot" style="background:${zoneColor(avg)}"></span><span class="t"><h3>${esc(plDate(k))}</h3><small>${esc(s.streszczenie || '')}</small></span>${CHEV}</button>`;
+  }
+  if (!keys.length && !all) h += `<div class="empty">Pierwsze podsumowanie pojawi się w środę 11.11 rano, z wpisów z wtorku.</div>`;
+  return h + '</div>';
+}
+
+function vDetail() {
+  const k = S.detail, s = S.summaries[k];
+  if (!s) { S.view = 'home'; return vHome(); }
+  if (k === 'calosc') return vOverview(s);
+  const p = pts(s);
+  let h = `<div class="dhead"><button class="icon-btn" data-go="home" aria-label="Wróć">${BACK}</button><h1>${esc(plDate(k))}</h1></div>`;
+  h += `<div class="card"><p class="sum">${esc(s.streszczenie || '')}</p></div>`;
+  if (p.length) {
+    h += `<div class="card"><h2>Pobudzenie w ciągu dnia</h2>${chartPobudzenie([p])}
+      <div class="legend"><span><i style="background:var(--hyper)"></i>w górę: napięcie</span><span><i style="background:var(--ok)"></i>w oknie: da się działać</span><span><i style="background:var(--hypo)"></i>w dół: przygaszenie</span></div></div>`;
+    h += `<div class="card"><h2>Nastrój</h2>${chartNastroj(p)}</div>`;
+  }
+  if (Array.isArray(s.fazy) && s.fazy.length) {
+    h += `<div class="card"><h2>Kiedy i w którą stronę</h2><ul class="clean">${s.fazy.map(f => `<li><b>${esc(f.od || '')}${f.do ? '–' + esc(f.do) : ''}</b> <span class="dir ${esc(f.kierunek)}" style="font-weight:800;color:${f.kierunek === 'gora' ? 'var(--hyper)' : f.kierunek === 'dol' ? 'var(--hypo)' : 'var(--ok)'}">${esc(DIR[f.kierunek] || '')}</span><br>${esc(f.opis || '')}</li>`).join('')}</ul></div>`;
+  }
+  if (p.length) {
+    h += `<div class="section">Godzina po godzinie</div><div class="card"><div class="tl">${p.map(q => `<div class="row"><div class="time">${esc(q.czas)}</div><div>
+      ${q.kierunek ? `<div class="dir ${esc(q.kierunek)}">${esc(DIR[q.kierunek] || '')}</div>` : ''}
+      ${Array.isArray(q.uczucia) && q.uczucia.length ? `<div class="chips">${q.uczucia.map(u => `<span>${esc(u)}</span>`).join('')}</div>` : ''}
+      ${q.notatka ? `<div class="note">${esc(q.notatka)}</div>` : ''}</div></div>`).join('')}</div></div>`;
+  }
+  if (Array.isArray(s.zauwazone) && s.zauwazone.length) h += `<div class="card"><h2>Co zauważyłem</h2><ul class="clean">${s.zauwazone.map(z => `<li>${esc(z)}</li>`).join('')}</ul></div>`;
+  if (s.na_dzis) h += `<div class="card" style="background:var(--lav-soft)"><h2>Na dziś</h2><p>${esc(s.na_dzis)}</p></div>`;
+  return h + `<p class="foot">Poziomy na wykresach oszacował Claude z Twoich słów. To nie diagnoza, tylko obraz dnia.</p>`;
+}
+
+function vOverview(s) {
+  const dni = Array.isArray(s.dni) ? s.dni : [];
+  const COLS = ['var(--acc)', 'var(--hyper)', 'var(--ok)', 'var(--hypo)'];
+  const series = dni.map(d => pts(S.summaries[d.data]));
+  let h = `<div class="dhead"><button class="icon-btn" data-go="home" aria-label="Wróć">${BACK}</button><h1>Całe 3 dni</h1></div>`;
+  h += `<div class="card"><p class="sum">${esc(s.streszczenie || '')}</p></div>`;
+  if (series.some(x => x.length)) {
+    h += `<div class="card"><h2>Pobudzenie: dni obok siebie</h2>${chartPobudzenie(series, COLS)}<div class="legend">${dni.map((d, i) => `<span><i style="background:${COLS[i % 4]}"></i>${esc(plDate(d.data, { weekday: 'long' }))}</span>`).join('')}</div></div>`;
+  }
+  if (dni.length) h += `<div class="card"><h2>Dzień po dniu</h2><div class="tl">${dni.map(d => `<div class="row"><div class="time">${esc(plDate(d.data, { weekday: 'short' }))}</div><div><div class="note" style="color:var(--ink)">${esc(d.opis || '')}</div></div></div>`).join('')}</div></div>`;
+  if (Array.isArray(s.wzorce) && s.wzorce.length) h += `<div class="card"><h2>Powtarzające się wzorce</h2><ul class="clean">${s.wzorce.map(z => `<li>${esc(z)}</li>`).join('')}</ul></div>`;
+  if (Array.isArray(s.na_terapie) && s.na_terapie.length) h += `<div class="card" style="background:var(--lav-soft)"><h2>Może warto pokazać na terapii</h2><ul class="clean">${s.na_terapie.map(z => `<li>${esc(z)}</li>`).join('')}</ul></div>`;
+  return h + `<p class="foot">Poziomy oszacował Claude z Twoich słów. To nie diagnoza, tylko obraz tych dni.</p>`;
+}
+
+function vSettings() {
+  const perm = pushSupported() ? Notification.permission : 'brak';
+  const pl = { granted: pushOn() ? 'włączone ✓' : 'zgoda jest, ale niezapisane', denied: 'zablokowane', default: 'wyłączone', brak: 'niedostępne tutaj' }[perm];
+  return `<div class="dhead"><button class="icon-btn" data-go="home" aria-label="Wróć">${BACK}</button><h1>Ustawienia</h1></div>
+  <div class="card setting"><h2>Powiadomienia</h2>
+    <div class="kv"><span>Stan</span><b>${esc(pl)}</b></div>
+    <button class="btn primary small" data-act="push">${pushOn() ? 'Odśwież połączenie' : 'Włącz powiadomienia'}</button>
+    <button class="btn line small" data-act="test">Pokaż testowe powiadomienie</button>
+    ${S.pushMsg ? `<div class="warn">${esc(S.pushMsg)}</div>` : ''}
+  </div>
+  <div class="card setting"><h2>Plan przypomnień</h2>
+    <p class="days">${PLAN.dni.map(d => esc(plDate(d, { weekday: 'short', day: 'numeric', month: 'numeric' }))).join(', ')}</p>
+    <p>${esc(PLAN.godziny.join(' · '))}</p>
+    <p class="days">W szkole tylko w przerwach. Jeśli wpiszesz się sama do 20 min wcześniej, przypomnienie się pominie. Wpisywać możesz się zawsze, też wieczorem i w weekend.</p>
+  </div>
+  ${S.installEvt ? `<div class="card setting"><h2>Apka na ekranie głównym</h2><button class="btn primary small" data-act="install">Zainstaluj apkę</button></div>` : ''}
+  <div class="card setting"><h2>Połączenie z Claude</h2>
+    <div class="kv"><span>Repo</span><b>samopoczucie (prywatne)</b></div>
+    <div class="kv"><span>Klucz</span><b>${S.token ? 'zapisany ✓' : 'brak'}</b></div>
+    <button class="btn line small" data-act="disconnect">Zmień klucz</button>
+  </div>`;
+}
+
+/* ---------- rysowanie i kliknięcia ---------- */
+function render() {
+  const app = document.getElementById('app');
+  const v = !S.token ? 'setup' : S.view;
+  app.innerHTML = v === 'setup' ? vSetup() : v === 'settings' ? vSettings() : v === 'detail' ? vDetail() : vHome();
+  const ta = document.getElementById('txt');
+  if (ta) {
+    ta.addEventListener('input', () => {
+      S.text = ta.value; S.saved = false; LS.set('draft', S.text);
+      if (S.listening) { // zaczęła pisać w trakcie mówienia: kończymy słuchanie, zostaje to, co napisała
+        ignoreResults = true; stopListening(true); render();
+        const n = document.getElementById('txt'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+        return;
+      }
+      syncText();
+    });
+  }
+  const cb = document.getElementById('connBtn'); if (cb) cb.addEventListener('click', connect);
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-act],[data-sum]'); if (!t) return;
+  if (t.dataset.go) { S.view = t.dataset.go; S.pushMsg = ''; render(); scrollTo(0, 0); return; }
+  if (t.dataset.sum) { S.detail = t.dataset.sum; S.view = 'detail'; render(); scrollTo(0, 0); return; }
+  const a = t.dataset.act;
+  if (a === 'mic') { S.listening ? stopListening() : startListening(); }
+  else if (a === 'save') save();
+  else if (a === 'push') enablePush(false);
+  else if (a === 'test') testNotification();
+  else if (a === 'disconnect') disconnect();
+  else if (a === 'install' && S.installEvt) { S.installEvt.prompt(); S.installEvt = null; render(); }
+});
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; if (S.view === 'settings') render(); });
+
+/* ---------- start ---------- */
+(function init() {
+  const q = new URLSearchParams(location.search);
+  if (q.get('z') === 'alert') { S.fromAlert = true; history.replaceState(null, '', location.pathname); }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {});
+    navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.typ === 'alert') { S.fromAlert = true; S.saved = false; S.view = 'home'; render(); } });
+  }
+  render();
+  if (S.token) {
+    flush(); loadSummaries();
+    if (pushSupported() && Notification.permission === 'granted') enablePush(true);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && S.token) { S.saved = false; flush(); loadSummaries(); render(); }
+  });
+})();
+</script>
+</body>
+</html>
