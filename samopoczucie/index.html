@@ -281,7 +281,7 @@ async function enablePush(silent) {
       await putFile('config/subskrypcja.json', Object.assign(sub.toJSON(), { zapisano: isoLocal(new Date()) }), 'Subskrypcja powiadomień');
       LS.set('subEndpoint', sub.endpoint);
     }
-    if (!silent) S.pushMsg = 'Powiadomienia włączone ✓';
+    if (!silent) { S.pushMsg = ''; S.justEnabled = true; }
   } catch (e) {
     if (!silent) S.pushMsg = typeof e === 'number' ? errText(e) : 'Nie udało się włączyć powiadomień. Spróbuj jeszcze raz.';
   }
@@ -289,11 +289,12 @@ async function enablePush(silent) {
 }
 function pushOn() { return pushSupported() && Notification.permission === 'granted' && !!LS.get('subEndpoint', ''); }
 async function testNotification() {
+  if (!pushOn()) { S.pushMsg = 'Najpierw włącz powiadomienia.'; render(); return; }
+  S.pushMsg = 'Wysyłam…'; render();
   try {
-    const reg = await navigator.serviceWorker.ready;
-    await reg.showNotification('💭 Jak się czujesz?', { body: 'Tak będzie wyglądać przypomnienie.', icon: 'icon-192.png', badge: 'badge-96.png', tag: 'samopoczucie-test', vibrate: [300, 120, 300], data: { url: './?z=alert' } });
-    S.pushMsg = 'Testowe powiadomienie wysłane. Jeśli nic nie wyskoczyło, sprawdź ustawienia powiadomień telefonu.';
-  } catch (e) { S.pushMsg = 'Najpierw włącz powiadomienia.'; }
+    await putFile('config/test-teraz.json', { prosba: isoLocal(new Date()) }, 'Test powiadomienia');
+    S.pushMsg = 'Za ok. 1 minutę powinno przyjść powiadomienie „💭 Test”. Możesz zamknąć apkę.';
+  } catch (e) { S.pushMsg = typeof e === 'number' ? errText(e) : errText('net'); }
   render();
 }
 
@@ -425,6 +426,7 @@ function vHome() {
   <h1 class="hello">Hej, Agata</h1>
   <p class="lead">${S.fromAlert ? 'Krótka chwila dla siebie. ' : ''}Jak się teraz czujesz?</p>`;
   if (!pushOn() && pushSupported()) h += `<div class="card setting" style="margin-bottom:12px"><b>Włącz przypomnienia</b><span class="muted" style="font-size:15px">Żeby apka mogła co godzinę (w szkole w przerwach) zapytać, jak się czujesz.</span><button class="btn primary small" data-act="push">Włącz powiadomienia</button>${S.pushMsg ? `<div class="warn">${esc(S.pushMsg)}</div>` : ''}</div>`;
+  else if (S.justEnabled) h += `<div class="card setting" style="margin-bottom:12px"><b>Powiadomienia włączone ✓</b><span class="muted" style="font-size:15px">Sprawdź, czy dochodzą: wyślę testowe z serwera.</span><button class="btn line small" data-act="test">Wyślij testowe przypomnienie</button>${S.pushMsg ? `<div class="ok" style="margin-top:0">${esc(S.pushMsg)}</div>` : ''}</div>`;
   h += `<section class="rec">
     ${SR ? `<button class="mic${listening ? ' on' : ''}" data-act="mic" aria-pressed="${listening}" aria-label="${listening ? 'Zakończ mówienie' : 'Mów'}">${listening ? STOP : MIC}</button>
     <div class="mic-label">${listening ? 'Słucham… stuknij, żeby skończyć' : 'Stuknij i powiedz, co czujesz'}</div>` : `<div class="mic-label">Stuknij w pole i użyj 🎤 na klawiaturze</div>`}
@@ -495,7 +497,7 @@ function vSettings() {
   <div class="card setting"><h2>Powiadomienia</h2>
     <div class="kv"><span>Stan</span><b>${esc(pl)}</b></div>
     <button class="btn primary small" data-act="push">${pushOn() ? 'Odśwież połączenie' : 'Włącz powiadomienia'}</button>
-    <button class="btn line small" data-act="test">Pokaż testowe powiadomienie</button>
+    <button class="btn line small" data-act="test">Wyślij testowe przypomnienie</button>
     ${S.pushMsg ? `<div class="warn">${esc(S.pushMsg)}</div>` : ''}
   </div>
   <div class="card setting"><h2>Plan przypomnień</h2>
