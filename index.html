@@ -321,24 +321,31 @@ Zasady dla kroków:
 Odpowiadasz TYLKO JSON-em w formacie: {"steps":[{"t":"tekst kroku","min":3,"h":"krótka podpowiedź albo pusty tekst"}]}`;
 async function aiJSON(prompt){
   const key=getKey(); if(!key)throw new Error('NOKEY');
-  const models=['gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'];
-  let last='';
+  const models=['gemini-flash-lite-latest','gemini-2.5-flash-lite','gemini-2.5-flash','gemini-flash-latest'];
+  let last='', timeouts=0;
   for(const m of models){
-    let res;
-    try{res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
-      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.6}})});}
-    catch(e){throw new Error('NET')}
-    if(res.status===404){last='404';continue}
-    if(res.status===400||res.status===401||res.status===403)throw new Error('BADKEY');
-    if(res.status===429)throw new Error('LIMIT');
-    if(!res.ok){last=String(res.status);continue}
-    const j=await res.json();
-    const txt=(((j.candidates||[])[0]||{}).content||{}).parts?.map(p=>p.text||'').join('')||'';
-    const clean=txt.replace(/^```(json)?/,'').replace(/```$/,'').trim();
-    const out=JSON.parse(clean);
-    if(!out||!Array.isArray(out.steps))throw new Error('FORMAT');
-    return out.steps.filter(s=>s&&s.t).slice(0,12).map(s=>({id:uid('t'),t:String(s.t).slice(0,80),min:Math.max(1,Math.min(60,Math.round(+s.min||3))),h:String(s.h||'').slice(0,120)}));
+    let res; const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),15000);
+    try{res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.6,maxOutputTokens:1200}})});}
+    catch(e){clearTimeout(to);if(e.name==='AbortError'){timeouts++;last='timeout';continue}throw new Error('NET')}
+    clearTimeout(to);
+    if(!res.ok){
+      let msg='';try{msg=JSON.stringify(await res.json())}catch(e){}
+      if(/API[_ ]?key|API_KEY_INVALID|PERMISSION_DENIED|unregistered callers/i.test(msg)&&(res.status===400||res.status===403||res.status===401))throw new Error('BADKEY');
+      if(res.status===429){last='LIMIT';continue}
+      last=String(res.status);continue;
+    }
+    try{
+      const j=await res.json();
+      const txt=(((j.candidates||[])[0]||{}).content||{}).parts?.map(p=>p.text||'').join('')||'';
+      const clean=txt.replace(/^```(json)?/,'').replace(/```$/,'').trim();
+      const out=JSON.parse(clean);
+      if(!out||!Array.isArray(out.steps))throw 0;
+      return out.steps.filter(s=>s&&s.t).slice(0,12).map(s=>({id:uid('t'),t:String(s.t).slice(0,80),min:Math.max(1,Math.min(60,Math.round(+s.min||3))),h:String(s.h||'').slice(0,120)}));
+    }catch(e){last='FORMAT';continue}
   }
+  if(last==='LIMIT')throw new Error('LIMIT');
+  if(timeouts)throw new Error('SLOW');
   throw new Error('HTTP '+last);
 }
 function aiErr(e){const m=e&&e.message;
@@ -346,6 +353,7 @@ function aiErr(e){const m=e&&e.message;
   if(m==='BADKEY')return 'Klucz Google nie działa. Sprawdź go w ustawieniach.';
   if(m==='LIMIT')return 'Darmowy limit AI na teraz się skończył. Spróbuj za kilka minut.';
   if(m==='NET')return 'Brak internetu albo AI nie odpowiada. Spróbuj jeszcze raz.';
+  if(m==='SLOW')return 'AI odpowiada za wolno. Spróbuj jeszcze raz za chwilę.';
   return 'AI odpowiedziało dziwnie. Spróbuj jeszcze raz.';}
 async function runBreak(change){
   const d=draft; if(!d.name.trim()){d.err='Wpisz, co chcesz zrobić.';render();return}
